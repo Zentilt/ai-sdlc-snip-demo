@@ -1,0 +1,57 @@
+<main>
+  <h1>✂ Snip</h1>
+
+  <section class="shorten">
+    <h2>Shorten a URL</h2>
+    <form (submit)="submit($event)">
+      <input
+        type="url"
+        placeholder="https://example.com/very/long/path"
+        [value]="urlInput()"
+        (input)="urlInput.set($any($event.target).value)"
+        autocomplete="off"
+      />
+      <button type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Shortening…' : 'Shorten' }}
+      </button>
+    </form>
+
+    @if (formError()) {
+      <p class="error">{{ formError() }}</p>
+    }
+
+    @if (newLink(); as link) {
+      <div class="result">
+        Short link:&nbsp;<a [href]="link.shortUrl" target="_blank" rel="noopener noreferrer">{{ link.shortUrl }}</a>
+      </div>
+    }
+  </section>
+
+  <section class="links">
+    <h2>All links</h2>
+    @if (links().length === 0) {
+      <p class="empty">No links yet.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Original URL</th>
+            <th>Hits</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (link of links(); track link.code) {
+            <tr>
+              <td><a [href]="link.shortUrl" target="_blank" rel="noopener noreferrer">{{ link.code }}</a></td>
+              <td class="url-cell" [title]="link.url">{{ link.url }}</td>
+              <td>{{ link.hits }}</td>
+              <td>{{ link.createdAt.slice(0, 10) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</main>
