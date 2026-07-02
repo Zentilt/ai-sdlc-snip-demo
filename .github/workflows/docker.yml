@@ -1,0 +1,66 @@
+# .github/workflows/docker.yml
+#
+# Builds the self-contained bundle image and pushes it to ghcr.io.
+#
+# Path filter explanation
+# -----------------------
+# `bundle`                        — the submodule *pointer* (a gitlink in the
+#                                   tree, not a directory path).  GitHub treats
+#                                   it as a changed path whenever build-bundle
+#                                   commits a new release and bumps the pointer,
+#                                   so this workflow fires exactly once per
+#                                   release rather than on every source edit.
+# `.github/workflows/docker.yml`  — so this push (adding the file) also fires
+#                                   the workflow immediately for a smoke-test.
+
+name: Build and push image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - bundle                           # submodule pointer — updated by bundle.yml
+      - .github/workflows/docker.yml    # re-runs when this file itself changes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write    # needed to push to ghcr.io
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive    # populates bundle/ so the Dockerfile is present
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./bundle
+          file: ./bundle/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
