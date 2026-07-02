@@ -9,6 +9,7 @@ Each layer lives on its own **orphan branch** in this repo and is mounted as a
 | API server | `backend/` | `backend` | Bun · single-file · in-memory store · zero npm deps |
 | Web app | `frontend/` | `frontend` | Angular 19 · standalone components · signals |
 | CLI | `cli/` | `cli` | Node ≥ 18 · CommonJS · zero npm deps |
+| **Release bundle** | `bundle/` | `bundle` | **Generated** — do not hand-edit; run `node scripts/build-bundle.mjs` |
 
 ---
 
@@ -60,12 +61,23 @@ snip-demo/                ← superproject  (branch: main)
 │       ├── app.component.{ts,html,css}
 │       ├── app.config.ts
 │       └── link.service.ts
-└── cli/                  ← submodule → branch: cli
-    ├── cli.js            Node CommonJS CLI (zero deps)
-    ├── package.json      name: snip-cli  bin: snip → cli.js
-    ├── snip              sh wrapper
-    ├── snip.cmd          cmd.exe wrapper
-    └── snip.ps1          PowerShell wrapper
+├── cli/                  ← submodule → branch: cli
+│   ├── cli.js            Node CommonJS CLI (zero deps)
+│   ├── package.json      name: snip-cli  bin: snip → cli.js
+│   ├── snip              sh wrapper
+│   ├── snip.cmd          cmd.exe wrapper
+│   └── snip.ps1          PowerShell wrapper
+├── bundle/               ← submodule → branch: bundle  (GENERATED — do not hand-edit)
+│   ├── server.js         copied from backend/
+│   ├── cli.js            copied from cli/
+│   ├── public/           Angular build output (browser/)
+│   ├── .env              PUBLIC_DIR=./public  (Bun auto-loads)
+│   ├── package.json      start: bun server.js  (no "type" field)
+│   ├── Dockerfile        FROM oven/bun:1-alpine
+│   ├── .dockerignore
+│   └── railway.json      DOCKERFILE builder
+└── scripts/
+    └── build-bundle.mjs  assembles bundle/ from the other submodules
 ```
 
 ---
@@ -184,3 +196,44 @@ git push
 > `git submodule update --remote` fetches the remote and moves the recorded commit
 > to the branch's current HEAD. Without `--remote`, `git submodule update` checks
 > out the commit already recorded in the superproject (useful for reproducible builds).
+
+---
+
+## Bundle branch (generated release output)
+
+The `bundle` branch is **machine-generated** — never commit to it by hand.
+It combines the three source layers into a single self-contained directory that
+can be deployed directly with Bun, containerised with Docker, or pushed to
+Railway with one click.
+
+### What `bundle/` contains
+
+| File | Source |
+|------|--------|
+| `server.js` | copied as-is from `backend/` |
+| `cli.js` | copied as-is from `cli/` |
+| `public/` | `ng build` output from `frontend/dist/snip-frontend/browser/` |
+| `.env` | generated — `PUBLIC_DIR=./public` (makes Bun serve the UI) |
+| `package.json` | generated — `start: bun server.js`, **no `"type"` field** |
+| `Dockerfile` | generated — `FROM oven/bun:1-alpine` |
+| `.dockerignore` | generated |
+| `railway.json` | generated — selects `DOCKERFILE` builder |
+
+### Regenerate and publish
+
+```sh
+# Assemble + commit locally (safe no-op when nothing changed)
+node scripts/build-bundle.mjs
+
+# Assemble + commit + push bundle branch and main
+node scripts/build-bundle.mjs --push
+```
+
+The script:
+1. Pulls `backend`, `frontend`, and `cli` submodules to their branch tips.
+2. Runs `npm install && ng build` in `frontend/`; fails loudly if
+   `frontend/dist/snip-frontend/browser/index.html` is missing.
+3. Copies sources and build output into `bundle/`; writes all generated files.
+4. Commits inside `bundle/` only when something changed (`git diff --cached`).
+5. Bumps the superproject's `bundle` pointer only when it changed.
+6. Pushes `HEAD:bundle` and `main` only when `--push` is passed.
