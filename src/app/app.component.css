@@ -1,56 +1,201 @@
+/* ── Page shell ───────────────────────────────────────────────── */
 main {
-  max-width: 820px;
-  margin: 3rem auto;
-  padding: 0 1.25rem;
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--sp-16) var(--sp-6) var(--sp-12);
+  isolation: isolate;
 }
 
-h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 2rem; }
-h2 {
-  font-size: .8rem; font-weight: 600; color: #6b7280;
-  text-transform: uppercase; letter-spacing: .06em; margin-bottom: .75rem;
+/* Warm gradient glow fixed behind the whole viewport */
+main::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--glow-hero);
+  pointer-events: none;
+  z-index: -1;
 }
 
-section { margin-bottom: 2.5rem; }
+/* ── Hero ─────────────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  margin-bottom: var(--sp-10);
+}
 
-.shorten form { display: flex; gap: .5rem; }
+.hero h1 {
+  font-size: var(--t-hero);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--sp-3);
+}
+
+.tagline {
+  font-size: var(--t-lg);
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ── Pill input (chat-style shorten form) ─────────────────────── */
+.shorten {
+  margin-bottom: var(--sp-12);
+}
+
+.shorten form {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-5);
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.shorten form:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow), 0 0 0 3px rgba(220, 66, 155, 0.12);
+}
 
 .shorten input {
-  flex: 1; padding: .6rem .875rem;
-  border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem;
-  transition: border-color .15s;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: var(--t-base);
+  font-family: var(--font);
+  min-width: 0;
+  padding: var(--sp-2);
 }
-.shorten input:focus { outline: none; border-color: #6366f1; }
+
+.shorten input::placeholder { color: var(--muted); }
 
 .shorten button {
-  padding: .6rem 1.25rem;
-  background: #6366f1; color: #fff;
-  border: none; border-radius: 6px;
-  font-size: 1rem; font-weight: 500; cursor: pointer; white-space: nowrap;
-  transition: background .15s;
+  flex-shrink: 0;
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--grad);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-pill);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  box-shadow: var(--glow-btn);
+  transition: opacity 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
 }
-.shorten button:hover:not(:disabled) { background: #4f46e5; }
-.shorten button:disabled { opacity: .55; cursor: default; }
 
-.error { margin-top: .6rem; color: #dc2626; font-size: .9rem; }
+.shorten button:hover:not(:disabled) { opacity: 0.88; }
+.shorten button:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
 
-.result {
-  margin-top: .75rem; padding: .625rem .875rem;
-  background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;
-  font-size: .95rem;
+/* ── Notices ──────────────────────────────────────────────────── */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--r-lg);
+  font-size: var(--t-sm);
+  line-height: 1.5;
 }
-.result a { font-weight: 600; color: #059669; word-break: break-all; }
 
-.empty { color: #9ca3af; font-size: .9rem; }
+.notice--error {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  color: #fca5a5;
+}
 
-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.notice--ok {
+  background: rgba(52, 211, 153, 0.06);
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  color: var(--text);
+}
+
+.notice--ok a {
+  color: #34d399;
+  font-weight: 600;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.notice--ok a:hover { text-decoration: underline; }
+
+/* ── Links card ───────────────────────────────────────────────── */
+.links-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.links-card h2 {
+  padding: var(--sp-4) var(--sp-5);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.empty {
+  padding: var(--sp-8) var(--sp-5);
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--t-sm);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+}
+
 thead th {
-  background: #f3f4f6; font-weight: 600;
-  padding: .5rem .75rem; text-align: left;
-  border-bottom: 2px solid #e5e7eb;
+  padding: var(--sp-3) var(--sp-5);
+  text-align: left;
+  font-size: var(--t-xs);
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.015);
 }
-tbody td { padding: .5rem .75rem; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+
+tbody td {
+  padding: var(--sp-3) var(--sp-5);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: #f9fafb; }
-td a { color: #6366f1; font-weight: 500; text-decoration: none; }
+
+tbody tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+td a {
+  color: #a78bfa;
+  font-weight: 500;
+  text-decoration: none;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
 td a:hover { text-decoration: underline; }
-.url-cell { max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.url-cell {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}

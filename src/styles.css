@@ -1,3 +1,58 @@
-/* You can add global styles to this file, and also import other style files */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, sans-serif; color: #222; background: #fafafa; }
+
+:root {
+  /* Colors */
+  --bg:           #0a0a0b;
+  --surface:      #111115;
+  --surface-hi:   #1a1a20;
+  --border:       rgba(255, 255, 255, 0.07);
+  --border-focus: rgba(220, 100, 160, 0.4);
+  --text:         #f0f0f3;
+  --muted:        #6e6e7e;
+
+  /* Accent gradient: coral → rose → amber */
+  --grad:         linear-gradient(130deg, #ff6b6b 0%, #e0429b 55%, #ff8c42 100%);
+
+  /* Warm radial glow behind the hero */
+  --glow-hero:    radial-gradient(
+                    ellipse 800px 500px at 50% -80px,
+                    rgba(224, 66, 155, 0.16) 0%,
+                    rgba(255, 107, 107, 0.07) 50%,
+                    transparent 70%
+                  );
+
+  /* Font */
+  --font:         'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Type scale */
+  --t-xs:    0.6875rem;  /* 11 px */
+  --t-sm:    0.8125rem;  /* 13 px */
+  --t-base:  0.9375rem;  /* 15 px */
+  --t-lg:    1.0625rem;  /* 17 px */
+  --t-hero:  3.25rem;    /* 52 px */
+
+  /* Spacing */
+  --sp-1:  0.25rem;   --sp-2:  0.5rem;   --sp-3:  0.75rem;
+  --sp-4:  1rem;      --sp-5:  1.25rem;  --sp-6:  1.5rem;
+  --sp-8:  2rem;      --sp-10: 2.5rem;   --sp-12: 3rem;
+  --sp-16: 4rem;
+
+  /* Radii */
+  --r-sm:   6px;   --r-md:   10px;  --r-lg:   14px;
+  --r-xl:   20px;  --r-pill: 9999px;
+
+  /* Shadows / glows */
+  --shadow:    0 1px 3px rgba(0, 0, 0, 0.5), 0 8px 32px rgba(0, 0, 0, 0.35);
+  --glow-btn:  0 4px 24px rgba(224, 66, 155, 0.45);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--t-base);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -1,8 +1,10 @@
 <main>
-  <h1>✂ Snip</h1>
+  <div class="hero">
+    <h1>✂ Snip</h1>
+    <p class="tagline">Paste a URL. Get a short link instantly.</p>
+  </div>
 
   <section class="shorten">
-    <h2>Shorten a URL</h2>
     <form (submit)="submit($event)">
       <input
         type="url"
@@ -17,17 +19,17 @@
     </form>
 
     @if (formError()) {
-      <p class="error">{{ formError() }}</p>
+      <p class="notice notice--error">{{ formError() }}</p>
     }
 
     @if (newLink(); as link) {
-      <div class="result">
+      <div class="notice notice--ok">
         Short link:&nbsp;<a [href]="link.shortUrl" target="_blank" rel="noopener noreferrer">{{ link.shortUrl }}</a>
       </div>
     }
   </section>
 
-  <section class="links">
+  <section class="links-card">
     <h2>All links</h2>
     @if (links().length === 0) {
       <p class="empty">No links yet.</p>
